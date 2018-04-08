@@ -5,13 +5,26 @@
   <div class="container">
     {# Sponsors #}
     <h2>{% trans "Sponsors" %}</h2>
+      <div id="tracklist">
+        <div class="row row-centered">
+          <div class="section col-md-12">
+          </div>
+        </div>
+        <div class="row row-centered">
+          <div class="track col-12 col-sm-3 col-centered-rtl">
+            <a href="tracks.html#general_track">
+              <img src="images/Hamakor_Logo.png">
+              <h3>מסלול מרכזי</h3>
+            </a>
+          </div>
+        </div><!-- End row -->
+      </div><!-- End tracks container -->
     
-    <table class="front-page-sponsors">
       {% sponsor_levels as all_sponsor_levels %}
       {% for sponsor_level in all_sponsor_levels %}
         {% sponsors sponsor_level.name as level_sponsors %}
         {% if level_sponsors %}
-          <tr>
+	   <div class="row">
             <th class="{{ sponsor_level.name|slugify }}" width="300">
 	      {{ sponsor_level.name }}
 	    </th>
