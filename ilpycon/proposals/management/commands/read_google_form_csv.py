@@ -1,9 +1,11 @@
+import warnings
 import csv
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
+from ilpycon.symposion.speakers.models import Speaker
 from ...models import TalkProposal, TutorialProposal
 
 
@@ -32,6 +34,15 @@ HEADERS = [
 def make_user(email, first, last):
     username = email
     counter = 0
+
+    # We have a Unique condition on emails
+    email_query = User.objects.filter(email=email)
+    if email_query.exists():
+        user = email_query[0]
+        warnings.warn('User exists for {}: {}, first({}), last({})'.format(
+            user.email, user.username, user.first_name, user.last_name))
+        return user
+
     while User.objects.filter(username=username).exists():
         counter += 1
         username = '{email}-{counter}'.format(**locals())
@@ -56,6 +67,7 @@ def make_proposal(speaker, duration, kind,
                   specific_props, additional_notes,
                   recording_release, submitted):
     # Sorry, it's past 3AM
+    pass
 
 class Command(BaseCommand):
 
@@ -105,9 +117,6 @@ class Command(BaseCommand):
      
                                   
             
-        except:
-            pass
-
         csv_file = csv.writer(
             open(os.path.join(os.getcwd(), "build", "sponsors.csv"), "wb")
         )
