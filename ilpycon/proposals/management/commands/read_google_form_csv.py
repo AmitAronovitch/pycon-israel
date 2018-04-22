@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from ilpycon.symposion.speakers.models import Speaker
-from ...models import TalkProposal, TutorialProposal
+from ...models import TalkProposal, TutorialProposal, Proposal
 
 
 HEADERS = [
@@ -61,13 +61,36 @@ def make_speaker(user, phone, bio, financial_assistance):
     )
 
 
+def _find_choice_index(choice, choices, index=0):
+    for i, vals in enumerate(choices):
+        if choice == vals[index]:
+            return i
+    return None
+
+
 def make_proposal(speaker, duration, kind,
                   title, abstract, language, second_language,
-                  audience_level, target_audiences,
+                  audience_level, target_audience,
                   specific_props, additional_notes,
                   recording_release, submitted):
-    # Sorry, it's past 3AM
-    pass
+    if kind.name == 'talk':
+        assert _find_choice_index(duration, Proposal.DURATION_CHOICES) in {0, 1}
+        cls = TalkProposal
+    elif kind.name == 'tutorial':
+        assert _find_choice_index(duration, Proposal.DURATION_CHOICES) in {2, 3}
+        cls = TutorialProposal
+    else:
+        raise ValueError('Invalid kind: ' + kind.name)
+
+    proposal = cls.objects.create(
+        speaker=speaker, duration=duration, kind=kind,
+        title=title, abstract=abstract, language=language, second_language=second_language,
+        audience_level=audience_level,
+        specific_props=specific_props, additional_notes=additional_notes,
+        recording_release=recording_release, submitted=submitted)
+    proposal.target_audience.set(target_audience)
+    return proposal
+
 
 class Command(BaseCommand):
 
