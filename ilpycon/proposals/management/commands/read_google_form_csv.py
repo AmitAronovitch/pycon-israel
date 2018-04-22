@@ -95,6 +95,7 @@ def make_proposal(speaker, duration, kind,
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+        raise NotImplementedError('not supported yet: currently this is done via a notebook (pyconil2018_cfp.ipynb)')
         with open(args[0], newline='') as csv_file:
             reader = csv.reader(csv_file, delimiter='\t')
             for row in reader:
